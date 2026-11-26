@@ -9,6 +9,8 @@ export interface IPhotoSelectionConfig {
   endDate?: string;
   /** Trip's dominant city, used to filter the asset list to that location. */
   tripCity?: string | null;
+  /** Trip's dominant city as detected, kept even when the city filter is off. */
+  tripCityName?: string | null;
   /** Pre-filled name suggestion for a new album (e.g. "20180401 - Lisboa"). */
   suggestedAlbumName?: string;
 

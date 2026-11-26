@@ -11,9 +11,15 @@ import { format, parseISO } from "date-fns";
 
 interface IProps {
   onSelectTrip: (trip: IPotentialTrip) => void;
+  /** Called once when the page is opened with ?startDate&endDate in the URL,
+   *  with the detected trip that overlaps that range (if any). */
+  onRestoreFromUrl?: (trip: IPotentialTrip | undefined) => void;
 }
 
-export default function PotentialTrips({ onSelectTrip }: IProps) {
+const overlaps = (t: IPotentialTrip, start?: string, end?: string) =>
+  !!start && !!end && t.startDate <= end && t.endDate >= start;
+
+export default function PotentialTrips({ onSelectTrip, onRestoreFromUrl }: IProps) {
   const router = useRouter();
   const { config } = usePhotoSelectionContext();
   const { startDate: activeStart, endDate: activeEnd } = router.query as {
@@ -33,7 +39,18 @@ export default function PotentialTrips({ onSelectTrip }: IProps) {
       .finally(() => setLoading(false));
   }, []);
 
+  // Opened from a URL (a bookmark, a reload, or dates edited by hand): find the
+  // detected trip that overlaps the range so the page can name the album.
+  const suggestedOnce = React.useRef(false);
+  useEffect(() => {
+    if (!data || !onRestoreFromUrl || suggestedOnce.current) return;
+    if (!activeStart || !activeEnd) return;
+    suggestedOnce.current = true;
+    onRestoreFromUrl(data.trips.find((t) => overlaps(t, activeStart, activeEnd)));
+  }, [data, activeStart, activeEnd, onRestoreFromUrl]);
+
   const handleSelect = (trip: IPotentialTrip) => {
+    suggestedOnce.current = true;
     onSelectTrip(trip);
     router.push({
       pathname: router.pathname,
@@ -79,7 +96,7 @@ export default function PotentialTrips({ onSelectTrip }: IProps) {
   return (
     <div className="flex flex-col divide-y">
       {data.trips.map((t) => {
-        const isActive = activeStart === t.startDate && activeEnd === t.endDate;
+        const isActive = overlaps(t, activeStart, activeEnd);
         return (
           <button
             key={`${t.startDate}-${t.endDate}`}

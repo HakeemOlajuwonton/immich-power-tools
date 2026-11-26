@@ -8,6 +8,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { CalendarArrowUp, Hourglass } from "lucide-react";
 import { useConfig } from "@/contexts/ConfigContext";
 import AssetGrid from "@/components/shared/AssetGrid";
+import TripRangeBar from "@/components/albums/potential-albums/TripRangeBar";
 
 export default function PotentialAlbumsAssets() {
   const { exImmichUrl } = useConfig();
@@ -74,9 +75,12 @@ export default function PotentialAlbumsAssets() {
 
   if (loading)
     return (
-      <div className="flex flex-col gap-2 min-h-full justify-center items-center w-full">
-        <Hourglass />
-        <p className="text-lg">Loading...</p>
+      <div className="flex flex-col w-full">
+        <TripRangeBar />
+        <div className="flex flex-col gap-2 min-h-[50vh] justify-center items-center w-full">
+          <Hourglass />
+          <p className="text-lg">Loading...</p>
+        </div>
       </div>
     );
 
@@ -94,6 +98,12 @@ export default function PotentialAlbumsAssets() {
 
   return (
     <div className="w-full overflow-y-auto max-h-[calc(100vh-60px)]">
+      <TripRangeBar />
+      {endDate && processedAssets.length === 0 ? (
+        <p className="p-6 text-sm text-muted-foreground">
+          No photos outside albums in this range.
+        </p>
+      ) : null}
       <AssetGrid
         assets={processedAssets}
         isInternal={true}

@@ -2,6 +2,7 @@ import AlbumSelectorDialog from "@/components/albums/AlbumSelectorDialog";
 import PotentialAlbumsAssets from "@/components/albums/potential-albums/PotentialAlbumsAssets";
 import PotentialAlbumsDates from "@/components/albums/potential-albums/PotentialAlbumsDates";
 import PotentialTrips from "@/components/albums/potential-albums/PotentialTrips";
+import { tripAlbumName } from "@/components/albums/potential-albums/TripRangeBar";
 import AssetOffsetDialog from "@/components/assets/assets-options/AssetOffsetDialog";
 import PageLayout from "@/components/layouts/PageLayout";
 import FloatingBar from "@/components/shared/FloatingBar";
@@ -142,7 +143,18 @@ export default function PotentialAlbums() {
                       startDate: trip.startDate,
                       endDate: trip.endDate,
                       tripCity: trip.cityName,
+                      tripCityName: trip.cityName,
                       suggestedAlbumName: trip.suggestedName,
+                    },
+                  })
+                }
+                onRestoreFromUrl={(trip?: IPotentialTrip) =>
+                  updateContext({
+                    config: {
+                      tripCityName: trip?.cityName ?? null,
+                      suggestedAlbumName: startDate
+                        ? tripAlbumName(startDate, trip?.cityName)
+                        : undefined,
                     },
                   })
                 }
